@@ -1,3 +1,4 @@
+# app.py
 import streamlit as st
 import pandas as pd
 import joblib
@@ -13,7 +14,10 @@ st.set_page_config(
 )
 
 # --- Define Artifacts Directory (Using your specific path) ---
-ARTIFACTS_DIR = r"D:\projects\equipment_failure_prediction\artifacts"
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ARTIFACTS_DIR = os.path.join(BASE_DIR, "artifacts")
+
 
 # --- Load Logistic Model and Encoder ---
 @st.cache_resource

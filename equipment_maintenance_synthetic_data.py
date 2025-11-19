@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# equipment_maintenance_synthetic_data.py
 """
 Full analysis and model training script for equipment maintenance.
 This script performs:
