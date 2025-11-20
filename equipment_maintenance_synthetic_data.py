@@ -391,7 +391,6 @@ plt.savefig(save_path, bbox_inches='tight')
 plt.close(fig)
 print(f"Saved clean Learning Curves plot to '{save_path}'")
 
-
 # =============================================================================
 # --- 4. Noise Injection ---
 # =============================================================================
@@ -434,6 +433,11 @@ noisy_train_path = os.path.join(ARTIFACTS_DIR, "training_data_noisy.csv")
 df_noisy_train.to_csv(noisy_train_path, index=False)
 print(f"Noisy training data ready and saved to '{noisy_train_path}'")
 print(df_noisy_train.head())
+
+# =============================================================================
+# Check datatypes of all columns in the noisy dataset
+# =============================================================================
+print(df_noisy_train.dtypes)
 
 
 # =============================================================================

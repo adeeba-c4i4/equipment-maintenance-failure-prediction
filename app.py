@@ -13,11 +13,9 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- Define Artifacts Directory (Using your specific path) ---
-
+# --- Define Artifacts Directory ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ARTIFACTS_DIR = os.path.join(BASE_DIR, "artifacts")
-
 
 # --- Load Logistic Model and Encoder ---
 @st.cache_resource
@@ -53,36 +51,39 @@ features = [
 st.title("Equipment Failure Prediction")
 
 if not model or not le:
-    st.stop() # Stops the app if artifacts didn't load
+    st.stop()
 
-# --- Input Form (in the middle) ---
+# --- Input Form ---
 input_data = {}
 
 with st.form(key="input_form"):
     st.subheader("Input Equipment Feature Values")
-
-    # Create a 3-column layout for inputs
     cols = st.columns(3)
 
     for i, feature in enumerate(features):
-        col = cols[i % 3] # This creates the 3x3 grid
-        input_data[feature] = col.number_input(
-            feature.replace('_', ' ').capitalize(),
-            value=0.0,
-            format="%.4f"
-        )
+        col = cols[i % 3]
 
-    # Submit button inside the form
-    # FIX: Replaced use_container_width=True with width='stretch'
+        if feature in ['process_errors', 'age_of_equipment']:
+            input_data[feature] = col.number_input(
+                feature.replace('_', ' ').capitalize(),
+                value=0,
+                step=1,
+                format="%d"
+            )
+        else:
+            input_data[feature] = col.number_input(
+                feature.replace('_', ' ').capitalize(),
+                value=0.0,
+                format="%.4f"
+            )
+
     run_button = st.form_submit_button("Predict Failure", type="primary", width='stretch')
-
 
 # --- Main Output Section ---
 st.header("Prediction Result")
 output_container = st.container(border=True)
 
 if run_button:
-    # This block runs ONLY when the "Predict Failure" button is clicked
     input_df = pd.DataFrame([input_data])
 
     try:
@@ -93,7 +94,6 @@ if run_button:
         with output_container:
             st.subheader("Model Used: Logistic Regression")
 
-            # Use st.metric for a clear, visual output
             if pred_label.lower() == 'failure':
                 st.metric(
                     label="Model Prediction",
@@ -114,25 +114,19 @@ if run_button:
             st.divider()
 
             st.subheader("Prediction Confidence")
-            
-            # Create a DataFrame for the bar chart
             proba_df_chart = pd.DataFrame({
                 "Probability": pred_proba[0]
             }, index=le.classes_)
             
             st.bar_chart(proba_df_chart)
 
-            # Optional: Show the exact percentages in a table
             st.write("Probabilities:")
             proba_df_table = proba_df_chart.copy()
             proba_df_table["Probability"] = proba_df_table["Probability"].apply(lambda x: f"{x:.1%}")
-            # FIX: Replaced use_container_width=True with width='stretch'
             st.dataframe(proba_df_table, width='stretch')
-
 
     except Exception as e:
         output_container.error(f"Error during prediction: {e}")
 
 else:
-    # This is the default message before the button is pressed
     output_container.info('Enter feature values above and click "Predict Failure".')
